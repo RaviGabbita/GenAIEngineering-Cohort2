@@ -64,6 +64,8 @@ def calculate_result():
 
         # Make the API call
         response = requests.get(endpoint, params={"a": first_num, "b": second_num})
+        
+      #  response = requests.post(endpoint, json={"a": first_num, "b": second_num}) for 3_Clculator.py
 
         # Check if the request was successful
         if response.status_code == 200:
