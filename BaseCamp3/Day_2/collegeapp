@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Selection Helper</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+        }
+    }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f5ff;
+        }
+        .question-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .options {
+            display: grid;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .option {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .option:hover {
+            background-color: #e3e9ff;
+        }
+        .option.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .result {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>College Selection Helper</h1>
+        <div v-if="!showResults">
+            <div class="progress-bar">
+                <div class="progress" :style="{ width: progress + '%' }"></div>
+            </div>
+            <div class="question-container">
+                <h2>{{ currentQuestion.question }}</h2>
+                <div class="options">
+                    <div v-for="(option, index) in currentQuestion.options" 
+                         :key="index"
+                         class="option"
+                         :class="{ selected: selectedOption === index }"
+                         @click="selectOption(index)">
+                        {{ option.text }}
+                    </div>
+                </div>
+                <button @click="nextQuestion" :disabled="selectedOption === null">
+                    {{ currentQuestionIndex === questions.length - 1 ? 'See Results' : 'Next Question' }}
+                </button>
+            </div>
+        </div>
+        <div v-else class="result">
+            <h2>Your College Recommendations</h2>
+            <div v-for="(college, index) in recommendedColleges" :key="index">
+                <h3>{{ college.name }}</h3>
+                <p>{{ college.description }}</p>
+                <p><strong>Key Features:</strong> {{ college.features }}</p>
+            </div>
+            <button @click="restart">Start Over</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createApp } from 'vue';
+
+        createApp({
+            data() {
+                return {
+                    currentQuestionIndex: 0,
+                    selectedOption: null,
+                    answers: [],
+                    showResults: false,
+                    questions: [
+                        {
+                            question: "What is your preferred field of study?",
+                            options: [
+                                { text: "STEM (Science, Technology, Engineering, Mathematics)", value: "stem" },
+                                { text: "Business & Economics", value: "business" },
+                                { text: "Arts & Humanities", value: "arts" },
+                                { text: "Social Sciences", value: "social" }
+                            ]
+                        },
+                        {
+                            question: "What size of college do you prefer?",
+                            options: [
+                                { text: "Small (Less than 5,000 students)", value: "small" },
+                                { text: "Medium (5,000-15,000 students)", value: "medium" },
+                                { text: "Large (More than 15,000 students)", value: "large" }
+                            ]
+                        },
+                        {
+                            question: "What is your preferred location?",
+                            options: [
+                                { text: "Urban", value: "urban" },
+                                { text: "Suburban", value: "suburban" },
+                                { text: "Rural", value: "rural" }
+                            ]
+                        },
+                        {
+                            question: "What's your budget range for annual tuition?",
+                            options: [
+                                { text: "Under $20,000", value: "low" },
+                                { text: "20,000 - $40,000", value: "medium" },
+                                { text: "Above $40,000", value: "high" }
+                            ]
+                        },
+                        {
+                            question: "How important is campus life and extracurricular activities to you?",
+                            options: [
+                                { text: "Very Important", value: "high" },
+                                { text: "Somewhat Important", value: "medium" },
+                                { text: "Not Very Important", value: "low" }
+                            ]
+                        }
+                    ],
+                    collegeDatabase: {
+                        stem: {
+                            large: [
+                                {
+                                    name: "Tech University",
+                                    description: "Leading research institution known for engineering and computer science programs.",
+                                    features: "State-of-the-art laboratories, research opportunities, industry connections"
+                                },
+                                {
+                                    name: "Science State University",
+                                    description: "Comprehensive public university with strong STEM programs.",
+                                    features: "Large research funding, diverse program options, affordable tuition"
+                                }
+                            ],
+                            small: [
+                                {
+                                    name: "Innovation College",
+                                    description: "Small private college focusing on hands-on STEM education.",
+                                    features: "Small class sizes, personalized attention, strong industry placement"
+                                }
+                            ]
+                        },
+                        business: {
+                            urban: [
+                                {
+                                    name: "Metropolitan Business School",
+                                    description: "Located in the heart of the financial district.",
+                                    features: "Strong alumni network, internship opportunities, business partnerships"
+                                }
+                            ],
+                            suburban: [
+                                {
+                                    name: "Enterprise University",
+                                    description: "Renowned business school with comprehensive programs.",
+                                    features: "Entrepreneurship center, business incubator, global programs"
+                                }
+                            ]
+                        },
+                        arts: {
+                            small: [
+                                {
+                                    name: "Creative Arts College",
+                                    description: "Specialized institution for visual and performing arts.",
+                                    features: "Studio spaces, performance venues, exhibition opportunities"
+                                }
+                            ],
+                            urban: [
+                                {
+                                    name: "City Arts University",
+                                    description: "Urban campus with diverse artistic programs.",
+                                    features: "Cultural exposure, artistic community, modern facilities"
+                                }
+                            ]
+                        }
+                    }
+                };
+            },
+            computed: {
+                currentQuestion() {
+                    return this.questions[this.currentQuestionIndex];
+                },
+                progress() {
+                    return (this.currentQuestionIndex / this.questions.length) * 100;
+                },
+                recommendedColleges() {
+                    // Simple recommendation algorithm based on answers
+                    const field = this.answers[0];
+                    const size = this.answers[1];
+                    const location = this.answers[2];
+                    
+                    let recommendations = [];
+                    
+                    // Check field-specific colleges
+                    if (this.collegeDatabase[field]) {
+                        if (this.collegeDatabase[field][size]) {
+                            recommendations = recommendations.concat(this.collegeDatabase[field][size]);
+                        }
+                        if (this.collegeDatabase[field][location]) {
+                            recommendations = recommendations.concat(this.collegeDatabase[field][location]);
+                        }
+                    }
+                    
+                    return recommendations.slice(0, 3); // Return top 3 recommendations
+                }
+            },
+            methods: {
+                selectOption(index) {
+                    this.selectedOption = index;
+                },
+                nextQuestion() {
+                    if (this.selectedOption !== null) {
+                        this.answers[this.currentQuestionIndex] = this.currentQuestion.options[this.selectedOption].value;
+                        if (this.currentQuestionIndex < this.questions.length - 1) {
+                            this.currentQuestionIndex++;
+                            this.selectedOption = null;
+                        } else {
+                            this.showResults = true;
+                        }
+                    }
+                },
+                restart() {
+                    this.currentQuestionIndex = 0;
+                    this.selectedOption = null;
+                    this.answers = [];
+                    this.showResults = false;
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
+
