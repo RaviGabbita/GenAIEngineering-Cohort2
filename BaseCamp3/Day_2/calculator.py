@@ -6,7 +6,15 @@ st.title("Calculator App")
 st.write("This app connects to a FastAPI calculator service.")
 
 # Define the API base URL
+<<<<<<< HEAD
 api_url = "https://genaiengineering-cohort2-5svn.onrender.com"
+=======
+# api_url = "http://0.0.0.0:9321"
+
+# api_url = "https://genaiengineering-cohort2-tk9j.onrender.com"
+api_url = "https://genaiengineering-cohort2-uzeu.onrender.com"
+
+>>>>>>> ed6e1b02c80bb0f56684d2f95ae71177ed6be785
 
 # Initialize session state to store the calculator display and current operation
 if 'display' not in st.session_state:
@@ -63,9 +71,16 @@ def calculate_result():
         endpoint = f"{api_url}/{st.session_state.operation}"
 
         # Make the API call
+<<<<<<< HEAD
         #response = requests.get(endpoint, params={"a": first_num, "b": second_num})
         
         response = requests.post(endpoint, json={"a": first_num, "b": second_num}) 
+=======
+
+        # response = requests.get(endpoint, params={"a": first_num, "b": second_num})
+        # response = requests.get(endpoint, params={"a": first_num, "b": second_num})
+        response = requests.post(endpoint, json={"a": first_num, "b": second_num})
+>>>>>>> ed6e1b02c80bb0f56684d2f95ae71177ed6be785
 
         # Check if the request was successful
         if response.status_code == 200:
